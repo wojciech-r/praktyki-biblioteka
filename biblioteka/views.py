@@ -7,6 +7,7 @@ from django.contrib.auth import login as django_login
 from django.contrib.auth import logout as django_logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.db.models import Max
 
 import json
 
@@ -14,8 +15,8 @@ categories = Book.objects.values_list('category', flat=True).distinct()
 
 z = json.loads('{}')
 
-def categories_size(category, len):
 
+def categories_size(category, len):
     # appending the data
     z.update({category: len})
 
@@ -28,26 +29,35 @@ for category in categories:
 # Create your views here.
 
 books = Book.objects.all()
+
+maxPrice = books.order_by('-price')[0].price
+
+
 def mainWeb(request):
-    return render(request, 'biblioteka/main.html', {'books': books, 'categories': z})
+    return render(request, 'biblioteka/main.html', {'books': books, 'categories': z, 'maxPrice': maxPrice})
 
 
 def book_category(request, category):
     books = Book.objects.filter(category=category)
-    return render(request, 'biblioteka/main.html', {'books': books, 'categories': z})
+    return render(request, 'biblioteka/main.html', {'books': books, 'categories': z, 'maxPrice': maxPrice})
+
+
 def book_author(request, author):
     books = Book.objects.filter(author=author)
-    return render(request, 'biblioteka/main.html', {'books': books, 'categories': z})
+    return render(request, 'biblioteka/main.html', {'books': books, 'categories': z, 'maxPrice': maxPrice})
+
+
 def book_publishingHouse(request, publishingHouse):
     books = Book.objects.filter(publishingHouse=publishingHouse)
-    return render(request, 'biblioteka/main.html', {'books': books, 'categories': z})
+    return render(request, 'biblioteka/main.html', {'books': books, 'categories': z, 'maxPrice': maxPrice})
 
 
 def book_search(request):  # __icontains = lepsze wyszukiwanie
     search = request.GET.get('search').casefold()
-    books = Book.objects.filter(Q(title__icontains=search) | Q(author__icontains=search) | Q(category__icontains=search) | Q(
-        publishingHouse__icontains=search))
-    return render(request, 'biblioteka/main.html', {'books': books, 'categories': z})
+    books = Book.objects.filter(
+        Q(title__icontains=search) | Q(author__icontains=search) | Q(category__icontains=search) | Q(
+            publishingHouse__icontains=search))
+    return render(request, 'biblioteka/main.html', {'books': books, 'categories': z, 'maxPrice': maxPrice})
 
 
 def book_filtr(request):  # new
@@ -67,15 +77,19 @@ def book_filtr(request):  # new
         if not author:
             books = Book.objects.filter(price__range=(price1[0], price1[1]))
     print(books)
-    return render(request, 'biblioteka/main.html', {'books': books, 'categories': z})
+    return render(request, 'biblioteka/main.html', {'books': books, 'categories': z, 'maxPrice': maxPrice})
 
 
 def login(request):
     return render(request, 'biblioteka/login.html')
+
+
 def register(request):
     return render(request, 'biblioteka/register.html')
 
-from django.http import HttpResponse, HttpResponseNotFound, Http404,  HttpResponseRedirect
+
+from django.http import HttpResponse, HttpResponseNotFound, Http404, HttpResponseRedirect
+
 
 def loginUser(request):
     username = request.POST.get('login')
@@ -88,14 +102,15 @@ def loginUser(request):
         # Redirect to a success page.
         return HttpResponseRedirect("/")
     else:
-        return render(request, 'biblioteka/login.html', {'valid': 'Niepoprawne dane logowania!' })
+        return render(request, 'biblioteka/login.html', {'valid': 'Niepoprawne dane logowania!'})
         # Return an 'invalid login' error message.
+
 
 def registerUser(request):
     username = request.POST.get('login')
     password = request.POST.get('password')
     password2 = request.POST.get('password2')
-    #simple check data
+    # simple check data
     if username and password and password2:
         if password == password2:
             if username != password2:
@@ -104,13 +119,15 @@ def registerUser(request):
                 # Redirect to a success page.
                 return HttpResponseRedirect("/")
             else:
-                return render(request, 'biblioteka/register.html', {'valid': 'Nie ustawiaj takiego samego hasla jak login!'})
+                return render(request, 'biblioteka/register.html',
+                              {'valid': 'Nie ustawiaj takiego samego hasla jak login!'})
         else:
             return render(request, 'biblioteka/register.html', {'valid': 'Hasła nie są takie same!'})
     else:
         return render(request, 'biblioteka/register.html', {'valid': 'Pole są puste!'})
 
+
 @login_required
 def logout(request):
     django_logout(request)
-    return  HttpResponseRedirect('/')
+    return HttpResponseRedirect('/')
