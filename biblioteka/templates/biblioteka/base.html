@@ -1,0 +1,123 @@
+{% load static %}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+        $( function() {
+            $( "#slider-range" ).slider({
+                range: true,
+                min: 0,
+                max: 500,
+                values: [ 0, 400 ],
+                slide: function( event, ui ) {
+                    $( "#amount" ).val( ui.values[ 0 ] + "zł - " + ui.values[ 1 ] + "zł" );
+                }
+            });
+            $( "#amount" ).val($( "#slider-range" ).slider( "values", 0 ) +
+            "zł - " + $( "#slider-range" ).slider( "values", 1 ) + "zł");
+        } );
+    </script>
+
+</head>
+<body>
+    <nav class="fixed-top navbar navbar-light bg-light border border-info">
+      <a class="navbar-brand" href="/">Biblioteka</a>
+
+
+
+    </nav>
+
+    <nav class="fixed-top navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="/">Biblioteka</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarText">
+    <ul class="navbar-nav mr-auto">
+      <!-- <li class="nav-item active">
+        <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Features</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Pricing</a>
+      </li> -->
+    </ul>
+
+    <form action="{% url 'book_search' %}" method="get" class="form-inline" style="margin-right: 20px; ">
+        <input name="search" class="form-control mr-sm-2" type="search" placeholder="Mały Książe" aria-label="Search">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Szukaj</button>
+    </form>
+        {% if user.is_authenticated %}
+        Witaj, {{ user.username }}
+            <a href="/logout"><button type="button" class="btn btn-primary btn-sm" data-toggle="button" aria-pressed="false" autocomplete="off" style="margin-left: 20px;">Wyloguj się</button></a>
+        {% else %}
+            <a href="/login"><button type="button" class="btn btn-primary btn-sm" data-toggle="button" aria-pressed="false" autocomplete="off" style="margin-left: 20px;">Zaloguj się</button></a>
+            <a href="/register"><button type="button" class="btn btn-primary btn-sm" data-toggle="button" aria-pressed="false" autocomplete="off" style="margin-left: 20px;">Zarejestruj się</button></a>
+        {% endif %}
+  </div>
+</nav>
+
+
+    <div class="d-inline-flex" style="margin-top: 80px; width: 100%;">
+        <div class="fixed-top card border border-info" style="width: 14rem; margin-left: 10px; margin-top: 80px">
+          <div class="card-body mx-auto">
+            <h5 class="card-title text-center">Kategorie</h5>
+            <div class="btn-group-vertical " role="group" aria-label="...">
+                {% block test %}
+                    {% for key, value in categories.items %}
+
+                       <a role="button" class="btn btn-light" href="{% url 'book_category' category=key %}">{{ key }} ({{value}}) </a>
+                    {% endfor %}
+                {% endblock test %}
+
+
+            </div>
+          </div>
+        </div>
+
+        <ul class="list-group" style="margin-left: 240px;">
+            {% block content %}
+            {% endblock %}
+
+        </ul>
+
+        <div class="card fixed-top " style="margin-left: 30px; width: 20%; margin-left: 79%; margin-top: 80px;">
+          <h5 class="card-header">Filtry</h5>
+          <div class="card-body">
+              <form action="{% url 'book_filtr' %}" method="get" style="margin-top: 0px;">
+            <p>
+                <label for="amount">Cena: </label>
+                <input name="price" type="text" id="amount" readonly="" style="border:0; color:#f6931f; font-weight:bold; max-width: 100px">
+            </p>
+            <div style="margin-bottom: 20px;" id="slider-range" class="ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content"><span tabindex="0" class="ui-slider-handle ui-corner-all ui-state-default" style="left: 9%;"></span><span tabindex="0" class="ui-slider-handle ui-corner-all ui-state-default" style="left: 50%;"></span></div>
+
+                <div class="form-group">
+                    <label for="formGroupExampleInput">Autor</label>
+                    <input name="author" type="text" class="form-control" id="formGroupExampleInput" placeholder="Adam Mickiewicz">
+                    </div>
+                    <div class="form-group">
+                    <label for="formGroupExampleInput2">Wydawnictwo</label>
+                    <input name="publishingHouse" type="text" class="form-control" id="formGroupExampleInput2" placeholder="Greg">
+                </div>
+                <button class="btn btn-primary float-right" type="submit">Filtruj</button>
+            </form>
+
+          </div>
+        </div>
+    </div>
+    <script>$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})</script>
+</body>
+
+</html>

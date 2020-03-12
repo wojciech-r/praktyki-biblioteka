@@ -1,0 +1,10 @@
+@import url('https://fonts.googleapis.com/css?family=Abel|Muli|Josefin+Sans|Squada+One&display=swap');
+
+body{
+    background-image: url("https://w.wallhaven.cc/full/96/wallhaven-96yzg8.png");
+    font-family: 'Josefin Sans', sans-serif;
+    background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+}

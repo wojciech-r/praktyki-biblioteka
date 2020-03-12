@@ -1,0 +1,32 @@
+{% extends 'biblioteka/base.html' %}
+{% block content %}
+            {% if not books%}
+                <h1 style="color: white; margin-left: 40px;">Nie odnaleziono takiej ksiażki</h1>
+            {% endif %}
+            {% for book in books %}
+              <li class="list-group-item" style="width: 75%; max-width: 1200px; margin-left: 40px; margin-bottom: 20px;" >
+                  <button type="button" class="btn btn-primary btn-lg float-right" style="margin-left: 1%; cursor: default" disabled>{{ book.price }}zł</button>
+                  <button type="button" class="btn btn-outline-warning btn-lg float-right" style="cursor: default" disabled>{{ book.bookCondition }}</button>
+                  <div class="media" style="margin-top: 55px;">
+                      <img src="{{ book.image }}" alt="..." class="rounded float-left" width="200px" height="200px" style="margin-right: 30px;">
+                      <div class="media-body" >
+                        <h5 class="mt-0" style="margin-bottom: 4px;">{{ book.title }}</h5>
+                        <a class="nav-link active" style="padding-top: 0px; padding-left: 6px; padding-bottom: 0px;" href="{% url 'book_category' category=book.category %}">{{ book.category }}</a>
+                        <a class="nav-link active" style="padding-top: 0px; padding-left: 6px; padding-bottom: 0px;" href="{% url 'book_author' author=book.author %}">{{ book.author }}</a>
+                        <a class="nav-link active" style="padding-top: 0px; padding-left: 6px; padding-bottom: 0px;" href="{% url 'book_publishingHouse' publishingHouse=book.publishingHouse %}">{{ book.publishingHouse }}</a>
+                        <p style="margin-top: 10px;">{{ book.description }}</p>
+                      </div>
+                   </div>
+                  <div class="buttons" style="margin-top: 20px">
+                      {% if not user.is_authenticated %}
+                        <a class="btn btn-outline-success btn-lg float-right" style="cursor:default; color: #28a745;" onMouseOver="this.style.color='#fff'" onmouseout="this.style.color='#28a745'" role="button" aria-disabled="true" data-toggle="tooltip" data-placement="right" title="Zaloguj się aby kupić" >Wypożycz</a>
+                      {% else %}
+                        <a href="#" class="btn btn-outline-success btn-lg float-right " role="button" >Wypożycz</a>
+                      {% endif %}
+
+                  </div>
+              </li>
+
+            {% endfor %}
+
+{% endblock %}
